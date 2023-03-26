@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
     if (bind(s, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) error("Error binding port.\n");
     // Set socket to passive 
     if (listen(s, CONN_BUFFER_LEN) < 0) error("Error setting socket to listen.\n");
+    // Wait for connection
     if ((conn = accept(s, (struct sockaddr *)&conn_addr, &conn_len)) < 0) error("Failed to accept connection.\n");
 
     return 0;
