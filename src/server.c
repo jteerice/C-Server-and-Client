@@ -5,6 +5,8 @@
 #include <arpa/inet.h>
 #include <strings.h>
 
+#define CONN_BUFFER_LEN 1
+
 void error(char* error_mesg);
 
 int main(int argc, char** argv) {
@@ -12,8 +14,9 @@ int main(int argc, char** argv) {
     // Ensure correct syntax
     if (argc != 3) error("Syntax: <exec> <ip> <port>\n");
 
-    int s;
-    struct sockaddr_in server_addr;
+    int s, conn;
+    struct sockaddr_in server_addr, conn_addr;
+    socklen_t conn_len = sizeof(conn_addr);
 
     // Create socket
     s = socket(AF_INET, SOCK_STREAM, 0);
@@ -27,6 +30,9 @@ int main(int argc, char** argv) {
 
     // Bind socket to port
     if (bind(s, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) error("Error binding port.\n");
+    // Set socket to passive 
+    if (listen(s, CONN_BUFFER_LEN) < 0) error("Error setting socket to listen.\n");
+    if ((conn = accept(s, (struct sockaddr *)&conn_addr, &conn_len)) < 0) error("Failed to accept connection.\n");
 
     return 0;
 }
