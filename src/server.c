@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
+#include <strings.h>
 
 void error(char* error_mesg);
 
@@ -16,16 +18,15 @@ int main(int argc, char** argv) {
     // Create socket
     s = socket(AF_INET, SOCK_STREAM, 0);
     if (s < 0) error("Error creating socket.\n");
+    // Zero out address space of server_addr
+    bzero(&server_addr, sizeof(server_addr)); 
 
     server_addr.sin_family      = AF_INET;
-    printf("%s\n", argv[2]);
     server_addr.sin_port        = htons(atoi(argv[2]));  // Conert port number to network byte order
-    printf("here2\n");
-    server_addr.sin_addr.s_addr = inet_aton(argv[1]);    // Convert IP address to network byte order
-    //printf("here3\n");
+    server_addr.sin_addr.s_addr = inet_addr(argv[1]);    // Convert IP address to network byte order
 
     // Bind socket to port
-    if (bind(s, (struct sockaddr*)&server_addr, (socklen_t)sizeof(server_addr)) < 0) error("Error binding port.\n");
+    if (bind(s, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) error("Error binding port.\n");
 
     return 0;
 }
